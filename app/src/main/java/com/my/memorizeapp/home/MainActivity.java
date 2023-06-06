@@ -1,20 +1,35 @@
 package com.my.memorizeapp.home;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.my.memorizeapp.DB.DBHelper;
 import com.my.memorizeapp.R;
 import com.my.memorizeapp.addQuestion.AddQuestionActivity;
+import com.my.memorizeapp.recyclerView.RecyclerViewAdapter;
 import com.my.memorizeapp.viewQuestion.ViewNotesActivity;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.ArrayList;
+import java.util.List;
 
+public class MainActivity extends AppCompatActivity implements RecyclerViewAdapter.ItemClickListener {
+    DBHelper dbHelper;
+    SQLiteDatabase db;
     FloatingActionButton fabMain, fabQuestion, fabFolder;
+    RecyclerView recyclerView;
+    private ArrayList<String> folderList = new ArrayList<>();
+    private ArrayList<String> questionList = new ArrayList<>();
     private boolean isFabButtonsVisible = false;
+    RecyclerViewAdapter adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,6 +39,19 @@ public class MainActivity extends AppCompatActivity {
         fabFolder = findViewById(R.id.fabFolder);
         fabFolder.setSize(FloatingActionButton.SIZE_MINI);
         fabQuestion.setSize(FloatingActionButton.SIZE_MINI);
+        recyclerView = findViewById(R.id.recyclerView);
+
+        dbHelper = DBHelper.getInstance(this, "notes", null, 1);
+        db = dbHelper.getReadableDatabase();
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new RecyclerViewAdapter(folderList, this);
+        adapter.setItemClickListener(this);
+        recyclerView.setAdapter(adapter);
+
+
+
+
+
 
         fabMain.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -35,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         fabFolder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, ViewNotesActivity.class);
+                Intent intent = new Intent(MainActivity.this, AddFolderPopUpActivity.class);
                 startActivity(intent);
             }
         });
@@ -49,6 +77,24 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateRecyclerView();
+    }
+
+    private void updateRecyclerView() {
+        Cursor cursor = db.rawQuery("SELECT folder FROM folders", null);
+        folderList.clear();
+        if (cursor.moveToFirst()) {
+            do {
+                String folder = cursor.getString(0);
+                folderList.add(folder);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+
+    }
 
     private void toggleFabButtons() {
         if (isFabButtonsVisible) {
@@ -63,7 +109,6 @@ public class MainActivity extends AppCompatActivity {
     private void showFabButtons() {
         fabQuestion.show();
         fabFolder.show();
-        // 필요한 만큼의 FAB 버튼들을 보여줍니다.
 
         isFabButtonsVisible = true;
     }
@@ -71,8 +116,35 @@ public class MainActivity extends AppCompatActivity {
     private void hideFabButtons() {
         fabQuestion.hide();
         fabFolder.hide();
-        // 필요한 만큼의 FAB 버튼들을 감춥니다.
 
         isFabButtonsVisible = false;
+    }
+
+    @Override
+    public void onItemClick(View view, String folderName) {
+        setQuestionList(folderName);
+        if(questionList.isEmpty()){
+            showToast("저장된 문제가 없습니다.");
+        }else {
+            Intent intent = new Intent(MainActivity.this, ViewNotesActivity.class);
+            intent.putExtra("folderName", folderName);
+            startActivity(intent);
+        }
+
+    }
+
+    private void setQuestionList(String folderName){
+        Cursor cursor = db.rawQuery("SELECT notes.question FROM folders JOIN notes ON folders._id = notes.folder_id WHERE folders.folder ='" + folderName + "';", null);
+
+        questionList.clear();
+        if (cursor.moveToFirst()) {
+            do {
+                String question = cursor.getString(0);
+                questionList.add(question);
+            } while (cursor.moveToNext());
+        }
+    }
+    private void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }

@@ -41,7 +41,9 @@
             android:layout_height="wrap_content"
             android:text="o"
             android:textSize="20sp"
-            android:visibility="gone"/>
+            android:textColor="@color/black"
+            android:visibility="gone"
+            android:backgroundTint="@color/green"/>
         <Button
             android:id="@+id/btn_uncertain"
             android:layout_weight="1"
@@ -49,8 +51,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="△"
+            android:textColor="@color/black"
             android:textSize="20sp"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            android:backgroundTint="@color/yellow"/>
         <Button
             android:id="@+id/btn_dont_know"
             android:layout_weight="1"
@@ -59,7 +63,9 @@
             android:layout_height="wrap_content"
             android:text="x"
             android:textSize="20sp"
-            android:visibility="gone"/>
+            android:textColor="@color/black"
+            android:visibility="gone"
+            android:backgroundTint="@color/red"/>
 
     </LinearLayout>
 

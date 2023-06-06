@@ -1,5 +1,6 @@
 package com.my.memorizeapp.viewQuestion;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
@@ -43,27 +45,31 @@ public class ViewNotesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_notes);
+        Intent intent = getIntent();
+        folder = intent.getStringExtra("folderName");
         NoteFragment noteFragment = new NoteFragment();
         AnswerFragment answerFragment = new AnswerFragment();
         ft.add(R.id.fragment_note, noteFragment);
         ft.add(R.id.fragment_answer, answerFragment);
         ft.commit();
 
-        dbHelper = new DBHelper(this, "notes", null, 1);
+
+        dbHelper = DBHelper.getInstance(this, "notes", null, 1);
         db = dbHelper.getReadableDatabase();
 
-        Cursor cursor = db.rawQuery("SELECT question, answer FROM notes WHERE folder ='" + folder + "';", null);
+        Cursor cursor = db.rawQuery("SELECT notes.question, notes.answer FROM folders JOIN notes ON folders._id = notes.folder_id WHERE folders.folder ='" + folder + "';", null);
 
         if (cursor.moveToFirst()) {
             do {
                 String question = cursor.getString(0);
                 String answer = cursor.getString(1);
                 questionList.add(question);
+                answerList.add(answer);
             } while (cursor.moveToNext());
         }
 
+
         cursor.close();
-        db.close();
 
         btnShowAnswer = findViewById(R.id.btn_show_answer);
         btnCertain = findViewById(R.id.btn_certain);
@@ -123,19 +129,24 @@ public class ViewNotesActivity extends AppCompatActivity {
 
     }
 
-    public void setQuestion() {
+    private void setQuestion() {
         if (questionIndex >= questionList.size())
-            RandomQuestion();
+            if(dontKnowList.isEmpty())
+            {
+                //뒤로가기 + 토스트메시지
+            }else{
+                RandomQuestion();
+            }
         else
             Question();
     }
-    public void Question() {
+    private void Question() {
         textNote.setText(questionList.get(questionIndex).toString());
         textAnswer.setText(answerList.get(questionIndex).toString());
         questionIndex++;
     }
 
-    public void RandomQuestion() {
+    private void RandomQuestion() {
         Random random = new Random();
         questionListIndex = getUniqueQuestionIndex(random);
 
@@ -146,7 +157,7 @@ public class ViewNotesActivity extends AppCompatActivity {
     /**
      * 중복 문제 해결 함수
      */
-    public int getUniqueQuestionIndex(Random random) {
+    private int getUniqueQuestionIndex(Random random) {
         int questionListIndex = -1;
         String previousQuestion = textNote.getText().toString();
 
@@ -160,7 +171,7 @@ public class ViewNotesActivity extends AppCompatActivity {
         }
         return questionListIndex;
     }
-    public boolean allQuestionSame() {
+    private boolean allQuestionSame() {
         boolean allQuestionsSame = true;
         int index = 0;
         while (index < dontKnowList.size()) {
@@ -175,7 +186,7 @@ public class ViewNotesActivity extends AppCompatActivity {
     }
 
 
-    public void btnVisibility() {
+    private void btnVisibility() {
         btnCertain.setVisibility(View.GONE);
         btnUncertain.setVisibility(View.GONE);
         btnDontKnow.setVisibility(View.GONE);
@@ -183,7 +194,7 @@ public class ViewNotesActivity extends AppCompatActivity {
         frameAnswer.setVisibility(View.INVISIBLE);
     }
 
-    public void addDontKnowList() {
+    private void addDontKnowList() {
         if(questionIndex > questionList.size()){
             dontKnowList.add(dontKnowList.get(questionListIndex));
             dontKnowAnswerList.add(dontKnowAnswerList.get(questionListIndex));
@@ -192,5 +203,8 @@ public class ViewNotesActivity extends AppCompatActivity {
             dontKnowAnswerList.add(answerList.get(questionIndex - 1));
         }
 
+    }
+    private void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }
