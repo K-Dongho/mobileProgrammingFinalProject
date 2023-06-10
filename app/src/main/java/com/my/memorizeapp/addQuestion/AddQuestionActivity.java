@@ -59,9 +59,9 @@ public class AddQuestionActivity extends AppCompatActivity {
                         folderId = cursor.getInt(0);
                     }
                     cursor.close();
-
                     db.execSQL("INSERT INTO notes (folder_id, question, answer) VALUES (" + folderId + ", '" + question + "', '" + answer + "')");
                     showToast("문제가 추가되었습니다.");
+                    db.close();
                     finish();
                 }
 
@@ -77,12 +77,6 @@ public class AddQuestionActivity extends AppCompatActivity {
             }
         });
     }
-
-
-    private void showToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-    }
-
     private ArrayList<String> getFolderDataFromDB() {
         Cursor cursor = db.rawQuery("SELECT folder FROM folders", null);
         folderList.clear();
@@ -94,5 +88,8 @@ public class AddQuestionActivity extends AppCompatActivity {
         }
         cursor.close();
         return folderList;
+    }
+    private void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }

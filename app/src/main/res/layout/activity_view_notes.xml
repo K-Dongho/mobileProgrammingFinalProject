@@ -32,7 +32,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
             android:text="정답 보기"
-            android:visibility="visible" />
+            android:visibility="visible"
+            app:cornerRadius="1dp" />
 
         <Button
             android:id="@+id/btn_certain"
@@ -44,7 +45,9 @@
             android:text="o"
             android:textColor="@color/black"
             android:textSize="20sp"
-            android:visibility="gone" />
+            android:visibility="gone"
+            app:cornerRadius="1dp"
+            />
 
         <Button
             android:id="@+id/btn_uncertain"
@@ -56,7 +59,9 @@
             android:text="△"
             android:textColor="@color/black"
             android:textSize="20sp"
-            android:visibility="gone" />
+            android:visibility="gone"
+            app:cornerRadius="1dp"
+            />
 
         <Button
             android:id="@+id/btn_dont_know"
@@ -68,7 +73,8 @@
             android:text="x"
             android:textColor="@color/black"
             android:textSize="20sp"
-            android:visibility="gone" />
+            android:visibility="gone"
+            app:cornerRadius="1dp"/>
 
     </LinearLayout>
 

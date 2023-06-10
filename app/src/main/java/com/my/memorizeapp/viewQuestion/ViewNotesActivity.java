@@ -83,7 +83,6 @@ public class ViewNotesActivity extends AppCompatActivity {
                 textAnswer = answerFragment.getView().findViewById(R.id.text_answer);
                 textNote.setText(questionList.get(questionIndex).toString());
                 textAnswer.setText(answerList.get(questionIndex).toString());
-                questionIndex++;
             }
         });
 
@@ -103,7 +102,11 @@ public class ViewNotesActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 btnVisibility();
+                if (questionIndex >= questionList.size())
+                    if(!dontKnowList.isEmpty())
+                        removeDontKnowList();
                 setQuestion();
+
             }
         });
         btnUncertain.setOnClickListener(new View.OnClickListener() {
@@ -129,11 +132,23 @@ public class ViewNotesActivity extends AppCompatActivity {
 
     }
 
+    private void removeDontKnowList(){
+        String removeString = dontKnowList.get(questionListIndex);
+        for (int i = dontKnowList.size() - 1; i >= 0; i--) { //제거되면서 인덱스가 변경되기 때문에 역순으로 돌면서 제거
+            if (removeString.equals(dontKnowList.get(i))) {
+                dontKnowList.remove(i);
+                dontKnowAnswerList.remove(i);
+            }
+        }
+    }
     private void setQuestion() {
+        questionIndex++;
         if (questionIndex >= questionList.size())
             if(dontKnowList.isEmpty())
             {
-                //뒤로가기 + 토스트메시지
+                showToast("학습이 완료 되었습니다.");
+                db.close();
+                finish();
             }else{
                 RandomQuestion();
             }
@@ -143,7 +158,6 @@ public class ViewNotesActivity extends AppCompatActivity {
     private void Question() {
         textNote.setText(questionList.get(questionIndex).toString());
         textAnswer.setText(answerList.get(questionIndex).toString());
-        questionIndex++;
     }
 
     private void RandomQuestion() {
@@ -195,12 +209,12 @@ public class ViewNotesActivity extends AppCompatActivity {
     }
 
     private void addDontKnowList() {
-        if(questionIndex > questionList.size()){
+        if(questionIndex >= questionList.size()){
             dontKnowList.add(dontKnowList.get(questionListIndex));
             dontKnowAnswerList.add(dontKnowAnswerList.get(questionListIndex));
         }else{
-            dontKnowList.add(questionList.get(questionIndex - 1));
-            dontKnowAnswerList.add(answerList.get(questionIndex - 1));
+            dontKnowList.add(questionList.get(questionIndex));
+            dontKnowAnswerList.add(answerList.get(questionIndex));
         }
 
     }

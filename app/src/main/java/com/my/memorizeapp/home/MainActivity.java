@@ -1,6 +1,7 @@
 package com.my.memorizeapp.home;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -43,6 +44,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
 
         dbHelper = DBHelper.getInstance(this, "notes", null, 1);
         db = dbHelper.getReadableDatabase();
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(this, new LinearLayoutManager(this).getOrientation());
+        recyclerView.addItemDecoration(dividerItemDecoration);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new RecyclerViewAdapter(folderList, this);
         adapter.setItemClickListener(this);
@@ -84,6 +87,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     }
 
     private void updateRecyclerView() {
+        dbHelper = DBHelper.getInstance(this, "notes", null, 1);
+        db = dbHelper.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT folder FROM folders", null);
         folderList.clear();
         if (cursor.moveToFirst()) {
@@ -93,7 +98,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
             } while (cursor.moveToNext());
         }
         cursor.close();
-
     }
 
     private void toggleFabButtons() {
@@ -128,6 +132,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         }else {
             Intent intent = new Intent(MainActivity.this, ViewNotesActivity.class);
             intent.putExtra("folderName", folderName);
+            db.close();
             startActivity(intent);
         }
 
@@ -138,11 +143,10 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
 
         questionList.clear();
         if (cursor.moveToFirst()) {
-            do {
                 String question = cursor.getString(0);
                 questionList.add(question);
-            } while (cursor.moveToNext());
         }
+        cursor.close();
     }
     private void showToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();

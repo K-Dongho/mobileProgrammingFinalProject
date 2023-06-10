@@ -19,7 +19,7 @@
             android:id="@+id/textFolder"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="폴더 : "
+            android:text="노트 : "
             android:textStyle="bold"/>
 
         <Spinner
