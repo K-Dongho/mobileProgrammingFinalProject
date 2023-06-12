@@ -45,7 +45,6 @@ public class AddFolderPopUpActivity extends AppCompatActivity {
                 if(checkUniqueFolder(folderText)){
                     db.execSQL("INSERT INTO folders VALUES (null, '"+folderText+"')");
                     showToast("노트가 생성되었습니다.");
-                    db.close();
                     finish();
                 }else{
                     showToast("중복된 노트 이름 입니다.");

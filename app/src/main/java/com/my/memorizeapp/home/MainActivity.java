@@ -142,7 +142,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         }else {
             Intent intent = new Intent(MainActivity.this, ViewNotesActivity.class);
             intent.putExtra("folderName", folderName);
-            db.close();
             startActivity(intent);
         }
 

@@ -61,7 +61,6 @@ public class AddQuestionActivity extends AppCompatActivity {
                     cursor.close();
                     db.execSQL("INSERT INTO notes (folder_id, question, answer) VALUES (" + folderId + ", '" + question + "', '" + answer + "')");
                     showToast("문제가 추가되었습니다.");
-                    db.close();
                     finish();
                 }
 

@@ -147,7 +147,6 @@ public class ViewNotesActivity extends AppCompatActivity {
             if(dontKnowList.isEmpty())
             {
                 showToast("학습이 완료 되었습니다.");
-                db.close();
                 finish();
             }else{
                 RandomQuestion();
