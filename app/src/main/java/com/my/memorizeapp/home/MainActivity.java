@@ -2,6 +2,7 @@ package com.my.memorizeapp.home;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -10,6 +11,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -17,6 +19,7 @@ import com.my.memorizeapp.DB.DBHelper;
 import com.my.memorizeapp.R;
 import com.my.memorizeapp.addQuestion.AddQuestionActivity;
 import com.my.memorizeapp.recyclerView.RecyclerViewAdapter;
+import com.my.memorizeapp.recyclerView.SwipeDeleteCallback;
 import com.my.memorizeapp.viewQuestion.ViewNotesActivity;
 
 import java.util.ArrayList;
@@ -31,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
     private ArrayList<String> questionList = new ArrayList<>();
     private boolean isFabButtonsVisible = false;
     RecyclerViewAdapter adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,14 +46,20 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewAdapt
         fabQuestion.setSize(FloatingActionButton.SIZE_MINI);
         recyclerView = findViewById(R.id.recyclerView);
 
+
         dbHelper = DBHelper.getInstance(this, "notes", null, 1);
         db = dbHelper.getReadableDatabase();
+
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(this, new LinearLayoutManager(this).getOrientation());
         recyclerView.addItemDecoration(dividerItemDecoration);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new RecyclerViewAdapter(folderList, this);
         adapter.setItemClickListener(this);
         recyclerView.setAdapter(adapter);
+
+        ItemTouchHelper.Callback callback = new SwipeDeleteCallback(adapter);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
 
 
 
